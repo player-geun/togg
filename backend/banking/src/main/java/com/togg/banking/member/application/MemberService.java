@@ -20,4 +20,16 @@ public class MemberService {
     public Member findByRefreshToken(String refreshToken) {
         return memberRepository.getByRefreshToken(refreshToken);
     }
+
+    @Transactional
+    public void updateByRefreshToken(String refreshToken, String updatingRefreshToken) {
+        Member member = memberRepository.getByRefreshToken(refreshToken);
+        member.changeRefreshToken(updatingRefreshToken);
+    }
+
+    @Transactional
+    public void updateByEmail(String email, String updatingRefreshToken) {
+        Member member = memberRepository.getByEmail(email);
+        member.changeRefreshToken(updatingRefreshToken);
+    }
 }
