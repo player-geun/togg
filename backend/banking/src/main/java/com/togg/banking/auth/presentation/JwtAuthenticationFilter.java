@@ -1,5 +1,8 @@
-package com.togg.banking.auth.application;
+package com.togg.banking.auth.presentation;
 
+import com.togg.banking.auth.application.JwtProvider;
+import com.togg.banking.auth.application.JwtService;
+import com.togg.banking.member.application.MemberService;
 import com.togg.banking.member.domain.Member;
 import com.togg.banking.member.domain.MemberRepository;
 import jakarta.servlet.FilterChain;
@@ -27,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private static final String BEARER = "Bearer ";
 
     private final JwtProvider jwtProvider;
-    private final MemberRepository memberRepository;
+    private final JwtService jwtService;
+    private final MemberService memberService;
 
     @Value("${jwt.access.header}")
     private String accessHeader;
@@ -57,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private Optional<String> extractToken (HttpServletRequest request, String header) {
+    private Optional<String> extractToken(HttpServletRequest request, String header) {
         return Optional.ofNullable(request.getHeader(header))
                 .filter(token -> token.startsWith(BEARER))
                 .map(token -> token.replace(BEARER, ""));
@@ -67,7 +71,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String email = extractToken(request, accessHeader)
                 .map(jwtProvider::extractEmail)
                 .orElseThrow();
-        Member member = memberRepository.getByEmail(email);
+        Member member = memberService.findByEmail(email);
         saveAuthentication(member);
     }
 
@@ -84,19 +88,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateWithRefreshToken(HttpServletResponse response, String refreshToken) {
-        Member member = memberRepository.getByRefreshToken(refreshToken);
-        String reissuedRefreshToken = reissueRefreshToken(member);
+        String updatedRefreshToken = jwtProvider.createRefreshToken();
+        jwtService.updateByRefreshToken(refreshToken, updatedRefreshToken);
         response.setStatus(HttpServletResponse.SC_OK);
 
+        Member member = memberService.findByRefreshToken(updatedRefreshToken);
         String accessToken = jwtProvider.createAccessToken(member.getEmail());
         response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, reissuedRefreshToken);
-    }
-
-    private String reissueRefreshToken(Member member) {
-        String refreshToken = jwtProvider.createRefreshToken();
-        member.changeRefreshToken(refreshToken);
-        memberRepository.save(member);
-        return refreshToken;
+        response.setHeader(refreshHeader, updatedRefreshToken);
     }
 }
