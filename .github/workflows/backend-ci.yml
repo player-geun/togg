@@ -19,6 +19,12 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
+    
+    - name: Set Auth
+      run: |
+        mkdir -p src/main/resources
+        echo "${{ secrets.AUTH_YML }}" | base64 --decode > src/main/resources/application-auth.yml
+        find src
 
     - name: Set up JDK 17
       uses: actions/setup-java@v3

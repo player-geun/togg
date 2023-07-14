@@ -9,11 +9,11 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 class MemberTest {
 
     @ParameterizedTest
-    @ValueSource(strings = {"202-01-01", "20230101", "2023-0101"})
-    void 생년월일_형식이_올바르지_않으면_예외가_발생한다(String birthdate) {
+    @ValueSource(strings = {"geun@", "geun@gmail", "geun@gmail.c"})
+    void 이메일_형식이_올바르지_않으면_예외가_발생한다(String email) {
         // given & when & then
-        assertThatThrownBy(() -> new Member("이근우", birthdate, SocialType.KAKAO, "1"))
+        assertThatThrownBy(() -> new Member("이근우", email, SocialType.KAKAO, "1"))
                 .isInstanceOf(InvalidMemberException.class)
-                .hasMessage("생년월일 형식(YYYY-MM-DD)이 올바르지 않습니다.");
+                .hasMessage("이메일 형식이 올바르지 않습니다.");
     }
 }

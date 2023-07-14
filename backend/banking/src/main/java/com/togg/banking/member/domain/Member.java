@@ -6,20 +6,25 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
 public class Member {
+
+    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-z0-9._-]+@[a-z]+[.]+[a-z]{2,3}$");
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
-    private String name;
+    private String email;
 
     @Column(nullable = false)
-    private String birthdate;
+    private String name;
 
     @Enumerated(EnumType.STRING)
     private InvestmentType investmentType;
@@ -33,22 +38,24 @@ public class Member {
 
     private String refreshToken;
 
-    public Member(String name, String birthdate, SocialType socialType, String socialId) {
-        this(name, birthdate, null, socialType, socialId);
+    public Member(String name, String email, SocialType socialType, String socialId) {
+        this(name, email, null, socialType, socialId);
     }
 
-    public Member(String name, String birthdate, InvestmentType investmentType, SocialType socialType, String socialId) {
-        validateBirthdate(birthdate);
+    public Member(String name, String email, InvestmentType investmentType,
+                  SocialType socialType, String socialId) {
+        validateEmail(email);
+        this.email = email;
         this.name = name;
-        this.birthdate = birthdate;
         this.investmentType = investmentType;
         this.socialType = socialType;
         this.socialId = socialId;
     }
 
-    private void validateBirthdate(String birthdate) {
-        if (!birthdate.matches("^(19|20)\\d\\d[-](0[1-9]|1[012])[-](0[1-9]|[12][0-9]|3[01])$")) {
-            throw new InvalidMemberException("생년월일 형식(YYYY-MM-DD)이 올바르지 않습니다.");
+    private void validateEmail(String email) {
+        Matcher matcher = EMAIL_PATTERN.matcher(email);
+        if (!matcher.matches()) {
+            throw new InvalidMemberException("이메일 형식이 올바르지 않습니다.");
         }
     }
 
