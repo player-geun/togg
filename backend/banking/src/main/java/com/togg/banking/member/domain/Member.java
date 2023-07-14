@@ -27,6 +27,9 @@ public class Member {
     private String name;
 
     @Enumerated(EnumType.STRING)
+    private Role role;
+
+    @Enumerated(EnumType.STRING)
     private InvestmentType investmentType;
 
     @Enumerated(EnumType.STRING)
@@ -38,15 +41,16 @@ public class Member {
 
     private String refreshToken;
 
-    public Member(String name, String email, SocialType socialType, String socialId) {
-        this(name, email, null, socialType, socialId);
+    public Member(String name, String email, Role role, SocialType socialType, String socialId) {
+        this(name, email, role, null, socialType, socialId);
     }
 
-    public Member(String name, String email, InvestmentType investmentType,
+    public Member(String name, String email, Role role, InvestmentType investmentType,
                   SocialType socialType, String socialId) {
         validateEmail(email);
         this.email = email;
         this.name = name;
+        this.role = role;
         this.investmentType = investmentType;
         this.socialType = socialType;
         this.socialId = socialId;
