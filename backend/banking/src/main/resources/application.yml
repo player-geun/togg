@@ -3,4 +3,4 @@ spring:
     import: application-auth.yml
 
   profiles:
-    include: auth
+    include: auth, test
