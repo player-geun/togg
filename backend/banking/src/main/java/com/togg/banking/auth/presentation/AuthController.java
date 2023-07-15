@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URI;
+
 @RequiredArgsConstructor
 @RestController
 public class AuthController {
@@ -34,7 +36,7 @@ public class AuthController {
         String email = user.getUsername();
         SignUpResponse response = memberService.signUp(email, request);
         HttpHeaders headers = getHeadersWithTokens(email);
-        return ResponseEntity.ok().headers(headers).body(response);
+        return ResponseEntity.created(URI.create("/api/members/" + response.id())).headers(headers).body(response);
     }
 
     private HttpHeaders getHeadersWithTokens(String email) {
@@ -46,10 +48,5 @@ public class AuthController {
         headers.set(accessHeader, accessToken);
         headers.set(refreshHeader, refreshToken);
         return headers;
-    }
-
-    @GetMapping("/jwt")
-    public String jwt() {
-        return "ok";
     }
 }
