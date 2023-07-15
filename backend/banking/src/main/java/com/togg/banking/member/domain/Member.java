@@ -66,4 +66,12 @@ public class Member {
     public void changeRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public void authorize() {
+        this.role = Role.MEMBER;
+    }
+
+    public void changeInvestType(InvestmentType investmentType) {
+        this.investmentType = investmentType;
+    }
 }

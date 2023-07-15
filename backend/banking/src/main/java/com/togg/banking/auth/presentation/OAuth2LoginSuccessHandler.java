@@ -50,7 +50,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(refreshHeader, BEARER + refreshToken);
 
         setHeadersWithTokens(response, accessToken, refreshToken);
-        memberService.updateByEmail(email, refreshToken);
+        memberService.updateRefreshTokenByEmail(email, refreshToken);
     }
 
     private void setHeadersWithTokens(HttpServletResponse response, String accessToken, String refreshToken) {

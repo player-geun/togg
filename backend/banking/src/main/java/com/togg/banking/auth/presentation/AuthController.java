@@ -1,0 +1,55 @@
+package com.togg.banking.auth.presentation;
+
+import com.togg.banking.auth.application.JwtProvider;
+import com.togg.banking.auth.dto.SignUpRequest;
+import com.togg.banking.auth.dto.SignUpResponse;
+import com.togg.banking.member.application.MemberService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+@RequiredArgsConstructor
+@RestController
+public class AuthController {
+
+    private final MemberService memberService;
+    private final JwtProvider jwtProvider;
+
+    @Value("${jwt.access.header}")
+    private String accessHeader;
+
+    @Value("${jwt.refresh.header}")
+    private String refreshHeader;
+
+    @PostMapping("/sign-up")
+    public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request,
+                                                 @AuthenticationPrincipal UserDetails user) {
+        String email = user.getUsername();
+        SignUpResponse response = memberService.signUp(email, request);
+        HttpHeaders headers = getHeadersWithTokens(email);
+        return ResponseEntity.ok().headers(headers).body(response);
+    }
+
+    private HttpHeaders getHeadersWithTokens(String email) {
+        String accessToken = jwtProvider.createAccessToken(email);
+        String refreshToken = jwtProvider.createRefreshToken();
+        memberService.updateRefreshTokenByEmail(email, refreshToken);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(accessHeader, accessToken);
+        headers.set(refreshHeader, refreshToken);
+        return headers;
+    }
+
+    @GetMapping("/jwt")
+    public String jwt() {
+        return "ok";
+    }
+}
