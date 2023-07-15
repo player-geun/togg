@@ -3,6 +3,7 @@ package com.togg.banking.global.config;
 import com.togg.banking.auth.application.CustomOAuth2UserService;
 import com.togg.banking.auth.application.JwtProvider;
 import com.togg.banking.auth.presentation.JwtAuthenticationFilter;
+import com.togg.banking.auth.presentation.OAuth2LoginFailureHandler;
 import com.togg.banking.auth.presentation.OAuth2LoginSuccessHandler;
 import com.togg.banking.member.application.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +23,7 @@ import org.springframework.security.web.authentication.logout.LogoutFilter;
 public class SecurityConfig {
 
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtProvider jwtProvider;
     private final MemberService memberService;
@@ -45,8 +47,9 @@ public class SecurityConfig {
 
         http
                 .oauth2Login(oauth2 -> {oauth2
-                           .successHandler(oAuth2LoginSuccessHandler)
-                           .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService));
+                        .successHandler(oAuth2LoginSuccessHandler)
+                        .failureHandler(oAuth2LoginFailureHandler)
+                        .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService));
                 });
 
         http
