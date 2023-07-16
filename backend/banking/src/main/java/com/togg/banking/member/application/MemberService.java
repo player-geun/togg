@@ -4,6 +4,7 @@ import com.togg.banking.auth.dto.SignUpRequest;
 import com.togg.banking.auth.dto.SignUpResponse;
 import com.togg.banking.member.domain.Member;
 import com.togg.banking.member.domain.MemberRepository;
+import com.togg.banking.member.dto.MemberResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,6 +30,11 @@ public class MemberService {
         member.authorize();
         member.changeInvestType(request.investmentType());
         return new SignUpResponse(member);
+    }
+
+    public MemberResponse findById(Long id) {
+        Member member = memberRepository.getById(id);
+        return new MemberResponse(member);
     }
 
     @Transactional
