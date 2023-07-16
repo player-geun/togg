@@ -1,6 +1,7 @@
 package com.togg.banking.auth.presentation;
 
 import com.togg.banking.auth.application.JwtProvider;
+import com.togg.banking.auth.dto.LoginMember;
 import com.togg.banking.auth.dto.SignUpRequest;
 import com.togg.banking.auth.dto.SignUpResponse;
 import com.togg.banking.member.application.MemberService;
@@ -10,7 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,11 +32,10 @@ public class AuthController {
 
     @PostMapping("/sign-up")
     public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request,
-                                                 @AuthenticationPrincipal UserDetails user) {
-        String email = user.getUsername();
-        SignUpResponse response = memberService.signUp(email, request);
-        HttpHeaders headers = getHeadersWithTokens(email);
-        return ResponseEntity.created(URI.create("/api/members/" + response.id())).headers(headers).body(response);
+                                                 @AuthenticationPrincipal LoginMember loginMember) {
+        SignUpResponse response = memberService.signUp(loginMember.id(), request);
+        HttpHeaders headers = getHeadersWithTokens(loginMember.email());
+        return ResponseEntity.created(URI.create("/api/members/me")).headers(headers).body(response);
     }
 
     private HttpHeaders getHeadersWithTokens(String email) {
