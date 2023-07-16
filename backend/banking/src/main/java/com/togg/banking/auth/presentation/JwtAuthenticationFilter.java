@@ -1,6 +1,8 @@
 package com.togg.banking.auth.presentation;
 
 import com.togg.banking.auth.application.JwtProvider;
+import com.togg.banking.auth.domain.AuthenticationToken;
+import com.togg.banking.auth.dto.LoginMember;
 import com.togg.banking.member.application.MemberService;
 import com.togg.banking.member.domain.Member;
 import jakarta.servlet.FilterChain;
@@ -9,16 +11,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
@@ -77,15 +76,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void saveAuthentication(Member member) {
-        UserDetails userDetails = User.builder()
-                .username(member.getEmail())
-                .password("")
-                .roles(member.getRole().name())
-                .build();
-
-        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, authoritiesMapper.mapAuthorities(userDetails.getAuthorities()));
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole().name());
+        AuthenticationToken authentication = new AuthenticationToken(
+                authorities,
+                new LoginMember(member.getId(), member.getName(), member.getEmail()),
+                null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }

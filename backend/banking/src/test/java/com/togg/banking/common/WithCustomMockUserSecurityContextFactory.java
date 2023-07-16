@@ -1,29 +1,30 @@
 package com.togg.banking.common;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
-import org.springframework.security.core.authority.mapping.NullAuthoritiesMapper;
+import com.togg.banking.auth.domain.AuthenticationToken;
+import com.togg.banking.auth.dto.LoginMember;
+import com.togg.banking.member.domain.Member;
+import com.togg.banking.member.domain.Role;
+import com.togg.banking.member.domain.SocialType;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
+
+import java.util.List;
 
 public class WithCustomMockUserSecurityContextFactory implements WithSecurityContextFactory<WithCustomMockUser> {
 
     @Override
     public SecurityContext createSecurityContext(WithCustomMockUser annotation) {
-        UserDetails userDetails = User.builder()
-                .username("test@gmail.com")
-                .password("")
-                .roles("MEMBER")
-                .build();
+        Member member = new Member("이근우", "g@gmail.com", Role.MEMBER, SocialType.KAKAO, "1");
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole().name());
+        AuthenticationToken authentication = new AuthenticationToken(
+                authorities,
+                new LoginMember(member.getId(), member.getName(), member.getEmail()),
+                null);
 
         SecurityContext context = SecurityContextHolder.getContext();
-        GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
-        Authentication authentication = new UsernamePasswordAuthenticationToken(
-                userDetails, null, authoritiesMapper.mapAuthorities(userDetails.getAuthorities()));
         context.setAuthentication(authentication);
         return context;
     }

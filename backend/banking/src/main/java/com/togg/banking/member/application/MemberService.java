@@ -24,8 +24,8 @@ public class MemberService {
     }
 
     @Transactional
-    public SignUpResponse signUp(String email, SignUpRequest request) {
-        Member member = memberRepository.getByEmail(email);
+    public SignUpResponse signUp(Long id, SignUpRequest request) {
+        Member member = memberRepository.getById(id);
         member.authorize();
         member.changeInvestType(request.investmentType());
         return new SignUpResponse(member);
