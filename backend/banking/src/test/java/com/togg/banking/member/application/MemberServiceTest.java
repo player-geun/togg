@@ -2,25 +2,15 @@ package com.togg.banking.member.application;
 
 import com.togg.banking.auth.dto.SignUpRequest;
 import com.togg.banking.auth.dto.SignUpResponse;
+import com.togg.banking.common.ServiceTest;
 import com.togg.banking.member.domain.*;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class MemberServiceTest {
-
-    @InjectMocks
-    private MemberService memberService;
-
-    @Mock
-    private MemberRepository memberRepository;
+class MemberServiceTest extends ServiceTest {
 
     @Test
     void 회원가입을_한다() {

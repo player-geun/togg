@@ -1,41 +1,21 @@
 package com.togg.banking.account.application;
 
 import com.togg.banking.account.domain.Account;
-import com.togg.banking.account.domain.AccountRepository;
 import com.togg.banking.account.domain.AccountTransfer;
-import com.togg.banking.account.domain.AccountTransferRepository;
 import com.togg.banking.account.dto.AccountResponse;
 import com.togg.banking.account.dto.AccountTransferRequest;
 import com.togg.banking.account.dto.AccountTransferResponse;
+import com.togg.banking.common.ServiceTest;
 import com.togg.banking.member.domain.Member;
-import com.togg.banking.member.domain.MemberRepository;
 import com.togg.banking.member.domain.Role;
 import com.togg.banking.member.domain.SocialType;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
-@ExtendWith(MockitoExtension.class)
-class AccountServiceTest {
-
-    @InjectMocks
-    private AccountService accountService;
-
-    @Mock
-    private AccountRepository accountRepository;
-
-    @Mock
-    private AccountTransferRepository accountTransferRepository;
-
-    @Mock
-    private MemberRepository memberRepository;
+class AccountServiceTest extends ServiceTest {
 
     @Test
     void 계좌를_등록한다() {
