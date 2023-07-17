@@ -1,7 +1,9 @@
 package com.togg.banking.account.domain;
 
 import com.togg.banking.common.exception.NoSuchEntityException;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -16,9 +18,21 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
                 .orElseThrow(() -> new NoSuchEntityException("해당 회원 아이디의 계좌가 존재하지 않습니다."));
     }
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    default Account getByMemberIdWithLock(Long memberId) {
+        return findByMemberId(memberId)
+                .orElseThrow(() -> new NoSuchEntityException("해당 회원 아이디의 계좌가 존재하지 않습니다."));
+    }
+
     Optional<Account> findByNumber(String number);
 
     default Account getByNumber(String number) {
+        return findByNumber(number)
+                .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
+    }
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    default Account getByNumberWithLock(String number) {
         return findByNumber(number)
                 .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
     }
