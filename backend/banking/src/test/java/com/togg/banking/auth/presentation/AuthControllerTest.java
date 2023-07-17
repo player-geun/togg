@@ -4,6 +4,7 @@ import com.togg.banking.auth.dto.SignUpRequest;
 import com.togg.banking.auth.dto.SignUpResponse;
 import com.togg.banking.common.ControllerTest;
 import com.togg.banking.common.WithCustomMockUser;
+import com.togg.banking.common.fixtures.MemberFixtures;
 import com.togg.banking.member.domain.InvestmentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
@@ -19,7 +20,8 @@ class AuthControllerTest extends ControllerTest {
     @Test
     void 회원가입을_진행한다() throws Exception {
         // given
-        SignUpResponse response = new SignUpResponse(1L, "g@gamil.com", "이근우", InvestmentType.SAFE);
+        SignUpRequest request = MemberFixtures.SIGN_UP_REQUEST;
+        SignUpResponse response = MemberFixtures.SIGN_UP_RESPONSE;
         given(memberService.signUp(any(), any(SignUpRequest.class))).willReturn(response);
 
         // when & then
@@ -27,7 +29,7 @@ class AuthControllerTest extends ControllerTest {
                         .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new SignUpRequest(InvestmentType.SAFE)))
+                        .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isCreated());
     }

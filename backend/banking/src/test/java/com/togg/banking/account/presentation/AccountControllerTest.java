@@ -5,6 +5,8 @@ import com.togg.banking.account.dto.AccountTransferRequest;
 import com.togg.banking.account.dto.AccountTransferResponse;
 import com.togg.banking.common.ControllerTest;
 import com.togg.banking.common.WithCustomMockUser;
+import com.togg.banking.common.fixtures.AccountFixtures;
+import com.togg.banking.common.fixtures.AccountTransferFixtures;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -19,7 +21,7 @@ class AccountControllerTest extends ControllerTest {
     @Test
     void 계좌를_등록한다() throws Exception {
         // given
-        AccountResponse response = new AccountResponse(1L, "100012345678", 1000);
+        AccountResponse response = AccountFixtures.ACCOUNT_RESPONSE;
         given(accountService.create(any())).willReturn(response);
 
         // when & then
@@ -35,11 +37,8 @@ class AccountControllerTest extends ControllerTest {
     @Test
     void 계좌이체를_한다() throws Exception {
         // given
-        AccountTransferRequest request = new AccountTransferRequest("100012344321", 500);
-        AccountTransferResponse response = new AccountTransferResponse(
-                "100012345678",
-                "100012344321",
-                500);
+        AccountTransferRequest request = AccountTransferFixtures.ACCOUNT_TRANSFER_REQUEST;
+        AccountTransferResponse response = AccountTransferFixtures.ACCOUNT_TRANSFER_RESPONSE;
         given(accountService.transfer(any(), any(AccountTransferRequest.class))).willReturn(response);
 
         // when & then
