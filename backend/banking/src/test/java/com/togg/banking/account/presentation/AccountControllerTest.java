@@ -1,6 +1,8 @@
 package com.togg.banking.account.presentation;
 
 import com.togg.banking.account.dto.AccountResponse;
+import com.togg.banking.account.dto.AccountTransferRequest;
+import com.togg.banking.account.dto.AccountTransferResponse;
 import com.togg.banking.common.ControllerTest;
 import com.togg.banking.common.WithCustomMockUser;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,27 @@ class AccountControllerTest extends ControllerTest {
                         .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated());
+    }
+
+    @WithCustomMockUser
+    @Test
+    void 계좌이체를_한다() throws Exception {
+        // given
+        AccountTransferRequest request = new AccountTransferRequest("100012344321", 500);
+        AccountTransferResponse response = new AccountTransferResponse(
+                "100012345678",
+                "100012344321",
+                500);
+        given(accountService.transfer(any(), any(AccountTransferRequest.class))).willReturn(response);
+
+        // when & then
+        mockMvc.perform(post("/api/accounts/transfers")
+                        .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isCreated());
     }
