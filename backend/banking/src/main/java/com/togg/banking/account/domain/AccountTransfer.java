@@ -35,4 +35,14 @@ public class AccountTransfer {
         giver.withdraw(amount);
         receiver.deposit(amount);
     }
+
+    public void changeGiver(Account giver) {
+        this.giver = giver;
+        giver.getGivenAccountTransfers().add(this);
+    }
+
+    public void changeReceiver(Account receiver) {
+        this.receiver = receiver;
+        receiver.getReceivedAccountTransfers().add(this);
+    }
 }

@@ -42,12 +42,11 @@ class AccountServiceTest extends ServiceTest {
         Account receiverAccount = AccountFixtures.receiverAccount();
         AccountTransfer accountTransfer = AccountTransferFixtures.accountTransfer(500);
 
-        given(accountRepository.getByMemberIdWithLock(any())).willReturn(giverAccount);
-        given(accountRepository.getByNumberWithLock(any())).willReturn(receiverAccount);
-        given(accountTransferRepository.save(any(AccountTransfer.class))).willReturn(accountTransfer);
+        given(accountRepository.getByNumberWithGivenAccountTransfersAndLock(any())).willReturn(giverAccount);
+        given(accountRepository.getByNumberWithGivenAccountTransfersAndLock(any())).willReturn(receiverAccount);
 
         // when
-        AccountTransferResponse result = accountService.transfer(1L, request);
+        AccountTransferResponse result = accountService.transfer(request);
 
         // then
         assertThat(result.amount()).isEqualTo(500);
