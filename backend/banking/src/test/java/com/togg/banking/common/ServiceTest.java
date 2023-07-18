@@ -2,7 +2,6 @@ package com.togg.banking.common;
 
 import com.togg.banking.account.application.AccountService;
 import com.togg.banking.account.domain.AccountRepository;
-import com.togg.banking.account.domain.AccountTransferRepository;
 import com.togg.banking.member.application.MemberService;
 import com.togg.banking.member.domain.MemberRepository;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,9 +20,6 @@ public abstract class ServiceTest {
 
     @Mock
     protected AccountRepository accountRepository;
-
-    @Mock
-    protected AccountTransferRepository accountTransferRepository;
 
     @Mock
     protected MemberRepository memberRepository;
