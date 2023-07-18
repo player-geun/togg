@@ -7,6 +7,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Entity
@@ -28,6 +31,12 @@ public class Account {
 
     @Column(nullable = false)
     private int balance;
+
+    @OneToMany(mappedBy = "giver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AccountTransfer> givenAccountTransfers = new ArrayList<>();
+
+    @OneToMany(mappedBy = "receiver", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AccountTransfer> receivedAccountTransfers = new ArrayList<>();
 
     public Account(Member member, String number) {
         validateNumberLength(number);

@@ -4,6 +4,7 @@ import com.togg.banking.common.exception.NoSuchEntityException;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,29 +12,33 @@ import java.util.Optional;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
-    Optional<Account> findByMemberId(Long memberId);
+    @Query("SELECT DISTINCT a from Account a JOIN FETCH a.givenAccountTransfers WHERE a.number =:number")
+    Optional<Account> findByNumberWithGivenAccountTransfers(String number);
 
-    default Account getByMemberId(Long memberId) {
-        return findByMemberId(memberId)
-                .orElseThrow(() -> new NoSuchEntityException("해당 회원 아이디의 계좌가 존재하지 않습니다."));
+    default Account getByNumberWithGivenAccountTransfers(String number) {
+        return findByNumberWithGivenAccountTransfers(number)
+                .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
     }
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    default Account getByMemberIdWithLock(Long memberId) {
-        return findByMemberId(memberId)
-                .orElseThrow(() -> new NoSuchEntityException("해당 회원 아이디의 계좌가 존재하지 않습니다."));
-    }
+    @Query("SELECT DISTINCT a from Account a JOIN FETCH a.receivedAccountTransfers WHERE a.number =:number")
+    Optional<Account> findByNumberWithReceivedAccountTransfers(String number);
 
-    Optional<Account> findByNumber(String number);
-
-    default Account getByNumber(String number) {
-        return findByNumber(number)
+    default Account getByNumberWithReceivedAccountTransfers(String number) {
+        return findByNumberWithReceivedAccountTransfers(number)
                 .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
     }
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    default Account getByNumberWithLock(String number) {
-        return findByNumber(number)
+    @Query("SELECT DISTINCT a from Account a WHERE a.number =:number")
+    Optional<Account> findByNumberWithLock(String number);
+
+    default Account getByNumberWithGivenAccountTransfersAndLock(String number) {
+        return findByNumberWithLock(number)
+                .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
+    }
+
+    default Account getByNumberWithReceivedAccountTransfersAndLock(String number) {
+        return findByNumberWithLock(number)
                 .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
     }
 }

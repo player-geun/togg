@@ -33,13 +33,12 @@ class AccountControllerTest extends ControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @WithCustomMockUser
     @Test
     void 계좌이체를_한다() throws Exception {
         // given
         AccountTransferRequest request = AccountTransferFixtures.ACCOUNT_TRANSFER_REQUEST;
         AccountTransferResponse response = AccountTransferFixtures.ACCOUNT_TRANSFER_RESPONSE;
-        given(accountService.transfer(any(), any(AccountTransferRequest.class))).willReturn(response);
+        given(accountService.transfer(any(AccountTransferRequest.class))).willReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/accounts/transfers")
