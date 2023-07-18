@@ -13,10 +13,18 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
 
     @Query("SELECT DISTINCT a from Account a JOIN FETCH a.givenAccountTransfers WHERE a.number =:number")
-    Optional<Account> findByNumber(String number);
+    Optional<Account> findByNumberWithGivenAccountTransfers(String number);
 
-    default Account getByNumber(String number) {
-        return findByNumber(number)
+    default Account getByNumberWithGivenAccountTransfers(String number) {
+        return findByNumberWithGivenAccountTransfers(number)
+                .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
+    }
+
+    @Query("SELECT DISTINCT a from Account a JOIN FETCH a.receivedAccountTransfers WHERE a.number =:number")
+    Optional<Account> findByNumberWithReceivedAccountTransfers(String number);
+
+    default Account getByNumberWithReceivedAccountTransfers(String number) {
+        return findByNumberWithReceivedAccountTransfers(number)
                 .orElseThrow(() -> new NoSuchEntityException("해당 계좌번호의 계좌가 존재하지 않습니다."));
     }
 

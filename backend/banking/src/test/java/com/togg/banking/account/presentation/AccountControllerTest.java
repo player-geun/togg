@@ -33,7 +33,6 @@ class AccountControllerTest extends ControllerTest {
                 .andExpect(status().isCreated());
     }
 
-    @WithCustomMockUser
     @Test
     void 계좌이체를_한다() throws Exception {
         // given

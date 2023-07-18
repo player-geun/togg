@@ -37,4 +37,12 @@ public class AccountController {
                 .created(URI.create("/api/accounts/" + response.giverAccountNumber()))
                 .body(response);
     }
+
+    @GetMapping("/{accountNumber}")
+    public ResponseEntity<AccountTransfersResponse> findAccountTransfersByAccountNumber(
+            @PathVariable String accountNumber) {
+        AccountTransfersResponse response =
+                accountService.findAccountTransfersByAccountNumber(accountNumber);
+        return ResponseEntity.ok(response);
+    }
 }

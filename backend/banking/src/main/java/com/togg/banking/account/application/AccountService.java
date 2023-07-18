@@ -35,13 +35,29 @@ public class AccountService {
 
     @Transactional
     public AccountTransferResponse transfer(AccountTransferRequest request) {
-        Account giver = accountRepository.getByNumberWithGivenAccountTransfersAndLock(request.giverAccountNumber());
-        Account receiver = accountRepository.getByNumberWithReceivedAccountTransfersAndLock(request.receiverAccountNumber());
+        Account giver = accountRepository.getByNumberWithGivenAccountTransfersAndLock(
+                request.giverAccountNumber());
+        Account receiver = accountRepository.getByNumberWithReceivedAccountTransfersAndLock(
+                request.receiverAccountNumber());
 
         AccountTransfer accountTransfer = new AccountTransfer(giver, receiver, request.amount());
         accountTransfer.transfer();
         accountTransfer.changeGiver(giver);
         accountTransfer.changeReceiver(receiver);
         return new AccountTransferResponse(accountTransfer);
+    }
+
+    @Transactional(readOnly = true)
+    public AccountTransfersResponse findAccountTransfersByAccountNumber(String accountNumber) {
+        Account giver = accountRepository.getByNumberWithGivenAccountTransfers(accountNumber);
+        Account receiver = accountRepository.getByNumberWithReceivedAccountTransfers(accountNumber);
+
+        List<AccountTransferResponse> givenAccountTransfers = giver.getGivenAccountTransfers().stream()
+                .map(AccountTransferResponse::new)
+                .toList();
+        List<AccountTransferResponse> receivedAccountTransfers = receiver.getReceivedAccountTransfers().stream()
+                .map(AccountTransferResponse::new)
+                .toList();
+        return new AccountTransfersResponse(givenAccountTransfers, receivedAccountTransfers);
     }
 }
