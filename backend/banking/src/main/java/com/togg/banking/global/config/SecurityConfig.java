@@ -15,7 +15,12 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
+import org.springframework.web.cors.CorsConfiguration;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @RequiredArgsConstructor
 @EnableWebSecurity
@@ -41,7 +46,7 @@ public class SecurityConfig {
 
         http
                 .authorizeHttpRequests(request -> {request
-                        .requestMatchers("/").permitAll()
+                        .requestMatchers("/", "/auth/**", "/oauth2/**").permitAll()
                         .anyRequest().authenticated();
                 });
 
@@ -49,11 +54,18 @@ public class SecurityConfig {
                 .oauth2Login(oauth2 -> {oauth2
                         .successHandler(oAuth2LoginSuccessHandler)
                         .failureHandler(oAuth2LoginFailureHandler)
+                        .redirectionEndpoint(endpoint -> endpoint.baseUri("/oauth2/callback/*"))
+                        .authorizationEndpoint(endpoint -> endpoint.baseUri("/auth/authorize"))
                         .userInfoEndpoint(endpoint -> endpoint.userService(customOAuth2UserService));
                 });
 
         http
                 .addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
+
+
+
+        http
+                .cors();
 
         return http.build();
     }
