@@ -29,7 +29,7 @@ public class OAuthAttributes {
     }
 
     public Member toMember(SocialType socialType, UserInfo userInfo) {
-        return new Member(userInfo.getName(), UUID.randomUUID() + "@togg.com",
+        return new Member(userInfo.getName(), userInfo.getEmail(),
                 Role.GUEST, socialType, userInfo.getId());
     }
 }
