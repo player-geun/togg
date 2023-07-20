@@ -27,4 +27,14 @@ public class NaverUserInfo extends UserInfo {
         }
         return (String) response.get("name");
     }
+
+    @Override
+    public String getEmail() {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+        if (response == null) {
+            return null;
+        }
+        return (String) response.get("email");
+    }
 }

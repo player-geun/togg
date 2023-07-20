@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -34,14 +33,14 @@ public class AuthController {
     public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request,
                                                  @AuthenticationPrincipal LoginMember loginMember) {
         SignUpResponse response = memberService.signUp(loginMember.id(), request);
-        HttpHeaders headers = getHeadersWithTokens(loginMember.email());
+        HttpHeaders headers = getHeadersWithTokens(loginMember.id());
         return ResponseEntity.created(URI.create("/api/members/me")).headers(headers).body(response);
     }
 
-    private HttpHeaders getHeadersWithTokens(String email) {
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken();
-        memberService.updateRefreshTokenByEmail(email, refreshToken);
+    private HttpHeaders getHeadersWithTokens(Long id) {
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(id));
+        String refreshToken = jwtProvider.createRefreshToken(null);
+        memberService.updateRefreshTokenById(id, refreshToken);
 
         HttpHeaders headers = new HttpHeaders();
         headers.set(accessHeader, accessToken);
