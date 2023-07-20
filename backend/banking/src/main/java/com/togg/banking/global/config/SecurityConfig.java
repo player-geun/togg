@@ -65,7 +65,7 @@ public class SecurityConfig {
 
 
         http
-                .cors();
+                .cors(httpSecurityCorsConfigurer -> {});
 
         return http.build();
     }
