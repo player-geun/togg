@@ -11,10 +11,13 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
 
+import java.io.IOException;
+
 @RequiredArgsConstructor
 @Component
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
+    private static final String FRONT_URL = "http://localhost:3000";
     private static final String BEARER = "Bearer ";
 
     private final JwtProvider jwtProvider;
@@ -29,24 +32,26 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) {
+                                        Authentication authentication) throws IOException {
         CustomOAuth2User oAuth2User = (CustomOAuth2User) authentication.getPrincipal();
-        String email = oAuth2User.getEmail();
+        Long id = oAuth2User.getId();
         if (oAuth2User.isGuest()) {
-            String accessToken = jwtProvider.createAccessToken(email);
+            String accessToken = jwtProvider.createAccessToken(String.valueOf(id));
             response.addHeader(accessHeader, BEARER + accessToken);
 
             setHeadersWithTokens(response, accessToken, null);
+            response.sendRedirect(FRONT_URL + "/signup?token=" + BEARER + accessToken);
             return;
         }
 
-        String accessToken = jwtProvider.createAccessToken(email);
-        String refreshToken = jwtProvider.createRefreshToken();
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(id));
+        String refreshToken = jwtProvider.createRefreshToken(null);
         response.addHeader(accessHeader, BEARER + accessToken);
         response.addHeader(refreshHeader, BEARER + refreshToken);
 
         setHeadersWithTokens(response, accessToken, refreshToken);
-        memberService.updateRefreshTokenByEmail(email, refreshToken);
+        memberService.updateRefreshTokenById(id, refreshToken);
+        response.sendRedirect(FRONT_URL + "/sociallogin");
     }
 
     private void setHeadersWithTokens(HttpServletResponse response, String accessToken, String refreshToken) {

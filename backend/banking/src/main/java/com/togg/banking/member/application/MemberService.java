@@ -16,12 +16,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public Member findByEmail(String email) {
-        return memberRepository.getByEmail(email);
-    }
-
-    public Member findByRefreshToken(String refreshToken) {
-        return memberRepository.getByRefreshToken(refreshToken);
+    public MemberResponse findByRefreshToken(String refreshToken) {
+        Member member = memberRepository.getByRefreshToken(refreshToken);
+        return new MemberResponse(member);
     }
 
     @Transactional
@@ -44,8 +41,8 @@ public class MemberService {
     }
 
     @Transactional
-    public void updateRefreshTokenByEmail(String email, String updatingRefreshToken) {
-        Member member = memberRepository.getByEmail(email);
+    public void updateRefreshTokenById(Long id, String updatingRefreshToken) {
+        Member member = memberRepository.getById(id);
         member.changeRefreshToken(updatingRefreshToken);
     }
 }

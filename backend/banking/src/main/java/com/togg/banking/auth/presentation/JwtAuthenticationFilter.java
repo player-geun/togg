@@ -4,12 +4,13 @@ import com.togg.banking.auth.application.JwtProvider;
 import com.togg.banking.auth.domain.AuthenticationToken;
 import com.togg.banking.auth.dto.LoginMember;
 import com.togg.banking.member.application.MemberService;
-import com.togg.banking.member.domain.Member;
+import com.togg.banking.member.dto.MemberResponse;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -21,9 +22,9 @@ import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login";
     private static final String BEARER = "Bearer ";
 
     private final JwtProvider jwtProvider;
@@ -39,21 +40,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response);
-            return;
+        try {
+            String refreshToken = extractToken(request, refreshHeader).orElse(null);
+            if (refreshToken == null) {
+                authenticateWithAccessToken(request);
+            } else {
+                jwtProvider.validateToken(refreshToken);
+                authenticateWithRefreshToken(response, refreshToken);
+            }
+        } catch (Exception e) {
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         }
 
-        String refreshToken = extractToken(request, refreshHeader)
-                .filter(jwtProvider::isValidToken)
-                .orElse(null);
-        if (refreshToken == null) {
-            authenticateWithAccessToken(request);
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        authenticateWithRefreshToken(response, refreshToken);
         filterChain.doFilter(request, response);
     }
 
@@ -64,35 +62,33 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     }
 
     private void authenticateWithAccessToken(HttpServletRequest request) {
-        String email = extractToken(request, accessHeader)
-                .map(jwtProvider::extractEmail)
-                .orElse(null);
-        if (email == null) {
-            return;
-        }
+        String memberId = extractToken(request, accessHeader)
+                .map(jwtProvider::getSubject)
+                .orElseThrow();
 
-        Member member = memberService.findByEmail(email);
-        saveAuthentication(member);
+        MemberResponse response = memberService.findById(Long.valueOf(memberId));
+        saveAuthentication(response);
     }
 
-    private void saveAuthentication(Member member) {
-        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole().name());
+    private void saveAuthentication(MemberResponse response) {
+        List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(response.role().name());
         AuthenticationToken authentication = new AuthenticationToken(
                 authorities,
-                new LoginMember(member.getId(), member.getName(), member.getEmail()),
+                new LoginMember(response.id(), response.name()),
                 null);
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
     private void authenticateWithRefreshToken(HttpServletResponse response, String refreshToken) {
-        String updatedRefreshToken = jwtProvider.createRefreshToken();
+        String updatedRefreshToken = jwtProvider.createRefreshToken(null);
         memberService.updateByRefreshToken(refreshToken, updatedRefreshToken);
-        response.setStatus(HttpServletResponse.SC_OK);
 
-        Member member = memberService.findByRefreshToken(updatedRefreshToken);
-        String accessToken = jwtProvider.createAccessToken(member.getEmail());
+        MemberResponse member = memberService.findByRefreshToken(updatedRefreshToken);
+        String accessToken = jwtProvider.createAccessToken(String.valueOf(member.id()));
+
         response.setHeader(accessHeader, accessToken);
         response.setHeader(refreshHeader, updatedRefreshToken);
+        response.setStatus(HttpServletResponse.SC_OK);
     }
 }

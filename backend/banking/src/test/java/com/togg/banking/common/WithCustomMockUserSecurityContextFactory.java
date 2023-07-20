@@ -21,7 +21,7 @@ public class WithCustomMockUserSecurityContextFactory implements WithSecurityCon
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList(member.getRole().name());
         AuthenticationToken authentication = new AuthenticationToken(
                 authorities,
-                new LoginMember(member.getId(), member.getName(), member.getEmail()),
+                new LoginMember(member.getId(), member.getName()),
                 null);
 
         SecurityContext context = SecurityContextHolder.getContext();
