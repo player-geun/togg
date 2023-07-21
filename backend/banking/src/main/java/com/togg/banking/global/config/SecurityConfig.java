@@ -62,7 +62,10 @@ public class SecurityConfig {
         http
                 .addFilterAfter(jwtAuthenticationProcessingFilter(), LogoutFilter.class);
 
-
+        http
+                .exceptionHandling(configurer -> configurer
+                        .authenticationEntryPoint(new Http403ForbiddenEntryPoint())
+                );
 
         http
                 .cors(httpSecurityCorsConfigurer -> {});

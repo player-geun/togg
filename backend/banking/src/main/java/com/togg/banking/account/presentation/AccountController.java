@@ -1,11 +1,10 @@
 package com.togg.banking.account.presentation;
 
 import com.togg.banking.account.application.AccountService;
-import com.togg.banking.account.dto.AccountResponse;
-import com.togg.banking.account.dto.AccountTransferRequest;
-import com.togg.banking.account.dto.AccountTransferResponse;
-import com.togg.banking.account.dto.AccountTransfersResponse;
+import com.togg.banking.account.dto.*;
 import com.togg.banking.auth.dto.LoginMember;
+import com.togg.banking.member.application.MemberService;
+import com.togg.banking.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,11 +18,13 @@ import java.net.URI;
 public class AccountController {
 
     private final AccountService accountService;
+    private final MemberService memberService;
 
     @PostMapping
     public ResponseEntity<AccountResponse> create(
             @AuthenticationPrincipal LoginMember member) {
-        AccountResponse response = accountService.create(member.id());
+        Member foundMember = memberService.findByIdForOtherTransaction(member.id());
+        AccountResponse response = accountService.save(foundMember);
         return ResponseEntity
                 .created(URI.create("/api/accounts/" + response.id()))
                 .body(response);
@@ -38,11 +39,17 @@ public class AccountController {
                 .body(response);
     }
 
-    @GetMapping("/{accountNumber}")
+    @GetMapping("/{accountNumber}/transfers")
     public ResponseEntity<AccountTransfersResponse> findAccountTransfersByAccountNumber(
             @PathVariable String accountNumber) {
         AccountTransfersResponse response =
                 accountService.findAccountTransfersByAccountNumber(accountNumber);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AccountsResponse> findMyAccounts(@AuthenticationPrincipal LoginMember member) {
+        AccountsResponse response = accountService.findMyAccounts(member.id());
         return ResponseEntity.ok(response);
     }
 }

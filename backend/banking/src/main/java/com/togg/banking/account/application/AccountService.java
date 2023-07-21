@@ -1,12 +1,8 @@
 package com.togg.banking.account.application;
 
 import com.togg.banking.account.domain.*;
-import com.togg.banking.account.dto.AccountResponse;
-import com.togg.banking.account.dto.AccountTransferRequest;
-import com.togg.banking.account.dto.AccountTransferResponse;
-import com.togg.banking.account.dto.AccountTransfersResponse;
+import com.togg.banking.account.dto.*;
 import com.togg.banking.member.domain.Member;
-import com.togg.banking.member.domain.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,23 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AccountService {
 
     private final AccountRepository accountRepository;
-    private final MemberRepository memberRepository;
-
-    public AccountResponse create(Long id) {
-        Member member = memberRepository.getById(id);
-        Account account = save(member);
-        return new AccountResponse(account);
-    }
 
     @Transactional
-    public Account save(Member member) {
+    public AccountResponse save(Member member) {
         String number = AccountNumberFactory.createNumber();
         Account account = new Account(member, number);
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+        return new AccountResponse(savedAccount);
     }
 
     @Transactional
@@ -59,5 +50,11 @@ public class AccountService {
                 .map(AccountTransferResponse::new)
                 .toList();
         return new AccountTransfersResponse(givenAccountTransfers, receivedAccountTransfers);
+    }
+
+    public AccountsResponse findMyAccounts(Long memberId) {
+        List<Account> accounts = accountRepository.findByMemberId(memberId);
+        List<AccountResponse> responses = accounts.stream().map(AccountResponse::new).toList();
+        return new AccountsResponse(responses);
     }
 }
