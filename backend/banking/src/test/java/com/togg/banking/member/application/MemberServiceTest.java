@@ -5,6 +5,7 @@ import com.togg.banking.auth.dto.SignUpResponse;
 import com.togg.banking.common.ServiceTest;
 import com.togg.banking.common.fixtures.MemberFixtures;
 import com.togg.banking.member.domain.*;
+import com.togg.banking.member.dto.MemberResponse;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -18,6 +19,7 @@ class MemberServiceTest extends ServiceTest {
         // given
         SignUpRequest request = MemberFixtures.SIGN_UP_REQUEST;
         Member member = MemberFixtures.member();
+        
         given(memberRepository.getById(any())).willReturn(member);
 
         // when
@@ -25,5 +27,35 @@ class MemberServiceTest extends ServiceTest {
 
         // then
         assertThat(result.investmentType()).isEqualTo(request.investmentType());
+    }
+    
+    @Test
+    void 회원을_아이디로_조회한다() {
+        // given
+        Member member = MemberFixtures.member();
+        
+        given(memberRepository.getById(any())).willReturn(member);
+
+        // when
+        MemberResponse result = memberService.findById(1L);
+
+        // then
+        assertThat(result.name()).isEqualTo(member.getName());
+    }
+
+    @Test
+    void 회원을_리프레시_토큰으로_조회한다() {
+        // given
+        String refreshToken = "1234";
+        Member member = MemberFixtures.member();
+        member.changeRefreshToken(refreshToken);
+        
+        given(memberRepository.getByRefreshToken(any())).willReturn(member);
+
+        // when
+        MemberResponse result = memberService.findByRefreshToken(refreshToken);
+
+        // then
+        assertThat(result.name()).isEqualTo(member.getName());
     }
 }

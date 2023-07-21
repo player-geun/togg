@@ -6,6 +6,7 @@ import com.togg.banking.account.presentation.AccountController;
 import com.togg.banking.auth.application.JwtProvider;
 import com.togg.banking.auth.presentation.AuthController;
 import com.togg.banking.member.application.MemberService;
+import com.togg.banking.member.presentation.MemberController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,7 +16,8 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc(addFilters = false)
 @WebMvcTest({
         AccountController.class,
-        AuthController.class
+        AuthController.class,
+        MemberController.class
 })
 public abstract class ControllerTest {
 

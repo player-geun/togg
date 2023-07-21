@@ -16,11 +16,6 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
 
-    public MemberResponse findByRefreshToken(String refreshToken) {
-        Member member = memberRepository.getByRefreshToken(refreshToken);
-        return new MemberResponse(member);
-    }
-
     @Transactional
     public SignUpResponse signUp(Long id, SignUpRequest request) {
         Member member = memberRepository.getById(id);
@@ -31,6 +26,11 @@ public class MemberService {
 
     public MemberResponse findById(Long id) {
         Member member = memberRepository.getById(id);
+        return new MemberResponse(member);
+    }
+
+    public MemberResponse findByRefreshToken(String refreshToken) {
+        Member member = memberRepository.getByRefreshToken(refreshToken);
         return new MemberResponse(member);
     }
 
