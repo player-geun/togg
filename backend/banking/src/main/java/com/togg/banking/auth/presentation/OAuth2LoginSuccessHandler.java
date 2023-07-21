@@ -40,7 +40,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
             response.addHeader(accessHeader, BEARER + accessToken);
 
             setHeadersWithTokens(response, accessToken, null);
-            response.sendRedirect(FRONT_URL + "/signup?token=" + BEARER + accessToken);
+            response.sendRedirect(FRONT_URL + "/login?token=" + BEARER + accessToken);
             return;
         }
 
@@ -51,7 +51,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         setHeadersWithTokens(response, accessToken, refreshToken);
         memberService.updateRefreshTokenById(id, refreshToken);
-        response.sendRedirect(FRONT_URL + "/sociallogin");
+        response.sendRedirect(FRONT_URL + "/account");
     }
 
     private void setHeadersWithTokens(HttpServletResponse response, String accessToken, String refreshToken) {

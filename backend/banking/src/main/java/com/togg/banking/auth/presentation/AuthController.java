@@ -29,7 +29,7 @@ public class AuthController {
     @Value("${jwt.refresh.header}")
     private String refreshHeader;
 
-    @PostMapping("/sign-up")
+    @PostMapping("/signup")
     public ResponseEntity<SignUpResponse> signUp(@RequestBody SignUpRequest request,
                                                  @AuthenticationPrincipal LoginMember loginMember) {
         SignUpResponse response = memberService.signUp(loginMember.id(), request);
