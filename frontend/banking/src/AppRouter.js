@@ -14,6 +14,8 @@ function AppRouter() {
                     <Route path="/" element={<App/>}></Route>
                     <Route path="/login" element={<SocialLogin/>}></Route>
                     <Route path="/signup" element={<SignUp/>}></Route>
+                    <Route path="/account" element={<Account/>}></Route>
+                    <Route path="/account/transfer" element={<AccountTransfer/>}></Route>
                 </Routes>
             </BrowserRouter>
         </div>
