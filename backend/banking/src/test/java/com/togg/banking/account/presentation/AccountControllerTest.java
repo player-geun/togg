@@ -7,6 +7,8 @@ import com.togg.banking.common.ControllerTest;
 import com.togg.banking.common.WithCustomMockUser;
 import com.togg.banking.common.fixtures.AccountFixtures;
 import com.togg.banking.common.fixtures.AccountTransferFixtures;
+import com.togg.banking.common.fixtures.MemberFixtures;
+import com.togg.banking.member.domain.Member;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -22,7 +24,9 @@ class AccountControllerTest extends ControllerTest {
     void 계좌를_등록한다() throws Exception {
         // given
         AccountResponse response = AccountFixtures.ACCOUNT_RESPONSE;
-        given(accountService.create(any())).willReturn(response);
+        Member member = MemberFixtures.member();
+        given(memberService.findByIdForOtherTransaction(any())).willReturn(member);
+        given(accountService.save(any())).willReturn(response);
 
         // when & then
         mockMvc.perform(post("/api/accounts")

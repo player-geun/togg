@@ -5,7 +5,6 @@ import com.togg.banking.auth.dto.SignUpResponse;
 import com.togg.banking.common.ControllerTest;
 import com.togg.banking.common.WithCustomMockUser;
 import com.togg.banking.common.fixtures.MemberFixtures;
-import com.togg.banking.member.domain.InvestmentType;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 
@@ -25,7 +24,7 @@ class AuthControllerTest extends ControllerTest {
         given(memberService.signUp(any(), any(SignUpRequest.class))).willReturn(response);
 
         // when & then
-        mockMvc.perform(post("/sign-up")
+        mockMvc.perform(post("/signup")
                         .header(AUTHORIZATION_HEADER_NAME, AUTHORIZATION_HEADER_VALUE)
                         .accept(MediaType.APPLICATION_JSON)
                         .contentType(MediaType.APPLICATION_JSON)

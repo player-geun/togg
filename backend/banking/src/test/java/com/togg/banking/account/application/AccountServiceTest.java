@@ -19,16 +19,15 @@ import static org.mockito.BDDMockito.given;
 class AccountServiceTest extends ServiceTest {
 
     @Test
-    void 계좌를_등록한다() {
+    void 계좌를_저장한다() {
         // given
         Member member = MemberFixtures.member();
         Account account = AccountFixtures.account();
 
-        given(memberRepository.getById(any())).willReturn(member);
         given(accountRepository.save(any())).willReturn(account);
 
         // when
-        AccountResponse result = accountService.create(1L);
+        AccountResponse result = accountService.save(member);
 
         // then
         assertThat(result.balance()).isEqualTo(AccountFixtures.INITIAL_BALANCE);

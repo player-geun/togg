@@ -2,7 +2,6 @@ package com.togg.banking.account.application;
 
 import com.togg.banking.account.domain.*;
 import com.togg.banking.account.dto.*;
-import com.togg.banking.member.application.MemberService;
 import com.togg.banking.member.domain.Member;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,23 +10,18 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AccountService {
 
-    private final MemberService memberService;
     private final AccountRepository accountRepository;
 
-    public AccountResponse create(Long memberId) {
-        Member member = memberService.findByIdForOtherTransaction(memberId);
-        Account account = save(member);
-        return new AccountResponse(account);
-    }
-
     @Transactional
-    public Account save(Member member) {
+    public AccountResponse save(Member member) {
         String number = AccountNumberFactory.createNumber();
         Account account = new Account(member, number);
-        return accountRepository.save(account);
+        Account savedAccount = accountRepository.save(account);
+        return new AccountResponse(savedAccount);
     }
 
     @Transactional
