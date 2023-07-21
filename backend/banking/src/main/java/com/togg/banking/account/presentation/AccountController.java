@@ -1,10 +1,7 @@
 package com.togg.banking.account.presentation;
 
 import com.togg.banking.account.application.AccountService;
-import com.togg.banking.account.dto.AccountResponse;
-import com.togg.banking.account.dto.AccountTransferRequest;
-import com.togg.banking.account.dto.AccountTransferResponse;
-import com.togg.banking.account.dto.AccountTransfersResponse;
+import com.togg.banking.account.dto.*;
 import com.togg.banking.auth.dto.LoginMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -38,11 +35,17 @@ public class AccountController {
                 .body(response);
     }
 
-    @GetMapping("/{accountNumber}")
+    @GetMapping("/{accountNumber}/transfers")
     public ResponseEntity<AccountTransfersResponse> findAccountTransfersByAccountNumber(
             @PathVariable String accountNumber) {
         AccountTransfersResponse response =
                 accountService.findAccountTransfersByAccountNumber(accountNumber);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<AccountsResponse> findMyAccounts(@AuthenticationPrincipal LoginMember member) {
+        AccountsResponse response = accountService.findMyAccounts(member.id());
         return ResponseEntity.ok(response);
     }
 }

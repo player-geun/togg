@@ -34,6 +34,10 @@ public class MemberService {
         return new MemberResponse(member);
     }
 
+    public Member findByIdForOtherTransaction(Long id) {
+        return memberRepository.getById(id);
+    }
+
     @Transactional
     public void updateByRefreshToken(String refreshToken, String updatingRefreshToken) {
         Member member = memberRepository.getByRefreshToken(refreshToken);
