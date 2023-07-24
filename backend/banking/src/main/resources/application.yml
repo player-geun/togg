@@ -1,0 +1,6 @@
+spring:
+  config:
+    import: application-auth.yml
+
+  profiles:
+    include: auth, test
